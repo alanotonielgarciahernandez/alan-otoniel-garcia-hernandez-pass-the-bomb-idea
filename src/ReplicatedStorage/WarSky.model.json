@@ -1,0 +1,15 @@
+{
+  "className": "Sky",
+  "properties": {
+    "SourceAssetId": 74782625.0,
+    "SkyboxBackContent": "http://www.roblox.com/asset/?version=1&id=1012890",
+    "SkyboxDownContent": "http://www.roblox.com/asset/?version=1&id=1012891",
+    "SkyboxLeftContent": "http://www.roblox.com/asset/?version=1&id=1012889",
+    "SkyboxUpContent": "http://www.roblox.com/asset/?version=1&id=1014449",
+    "SkyboxRightContent": "http://www.roblox.com/asset/?version=1&id=1012888",
+    "SkyboxFrontContent": "http://www.roblox.com/asset/?version=1&id=1012887",
+    "SerializedOverrides": {
+      "BinaryString": ""
+    }
+  }
+}
