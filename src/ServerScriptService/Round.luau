@@ -202,6 +202,12 @@ function Round.start()
 	end);
 
 	DiedEvent.OnServerEvent:Connect(function(dPlayer)
+		local character = dPlayer.Character;
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid");
+		if character ~= nil and (humanoid == nil or humanoid.Health > 0) then
+			return;
+		end;
+
 		removePlrFromList(dPlayer);
 		table.insert(spects, dPlayer);
 		dPlayer.Team = Teams.Spectating;

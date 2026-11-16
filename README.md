@@ -66,7 +66,7 @@ The built file is ignored by Git. Open it in Roblox Studio when you want a place
 The gameplay below is copied from the original game. One player carries a bomb, eliminated players leave the round, and the match restarts after a winner is announced. Sudden death starts when 1 to 4 players remain.
 
 ## Joining and teams.
-A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. Players who die, or who fire `DiedEvent`, return to Spectating.
+A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. A player returns to Spectating when `DiedEvent` fires and that player has no character, or the character's humanoid health is already at 0. A living character is ignored.
 
 ## Match start.
 The notice GUI tells everyone the server is waiting for players, then that the match is starting. The map and spawn points are cloned from `ReplicatedStorage` into `Workspace.Game_Folder`.
