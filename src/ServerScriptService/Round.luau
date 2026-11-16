@@ -22,6 +22,8 @@ type PlayerListsModule = {
 
 type BombModule = {
 	give: (playingPlayers: {Player}) -> (),
+	isCarriedBy: (character: Model) -> boolean,
+	removeFrom: (character: Model) -> (),
 	start: () -> (),
 }
 
@@ -73,7 +75,7 @@ end
 local function onGame()
 	for _, player in playingPlayers do
 		local character = player.Character
-		if character ~= nil and character:FindFirstChild("Bomb") ~= nil then
+		if character ~= nil and Bomb.isCarriedBy(character) then
 			isBomb = true
 		end
 	end
@@ -91,10 +93,7 @@ local function onGame()
 		assert(winner ~= nil, "Winner is missing")
 		local character = winner.Character
 		if character ~= nil then
-			local bomb = character:FindFirstChild("Bomb")
-			if bomb ~= nil then
-				bomb:Destroy()
-			end
+			Bomb.removeFrom(character)
 		end
 
 		for _, player in Players:GetPlayers() do

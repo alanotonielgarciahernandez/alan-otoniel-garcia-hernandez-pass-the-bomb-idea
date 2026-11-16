@@ -198,6 +198,23 @@ function BombService.give(playingPlayers: {Player})
 	CollectionService:AddTag(bomb, BOMB_TAG)
 end
 
+function BombService.isCarriedBy(character: Model): boolean
+	for _, bomb in CollectionService:GetTagged(BOMB_TAG) do
+		if bomb.Parent == character then
+			return true
+		end
+	end
+	return false
+end
+
+function BombService.removeFrom(character: Model)
+	for _, bomb in CollectionService:GetTagged(BOMB_TAG) do
+		if bomb.Parent == character then
+			bomb:Destroy()
+		end
+	end
+end
+
 function BombService.start()
 	CollectionService:GetInstanceAddedSignal(BOMB_TAG):Connect(runBomb)
 	for _, bomb in CollectionService:GetTagged(BOMB_TAG) do
