@@ -75,7 +75,7 @@ The tests check the player lists, `GameMap.characterRoot`, and whether a charact
 The gameplay below is copied from the original game. One player carries a bomb, eliminated players leave the round, and the match restarts after a winner is announced. Sudden death starts when 1 to 4 players remain.
 
 ## Joining and teams.
-A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. `StarterPlayerScripts.Client` starts `Died`, which fires `DiedEvent` each time that player's humanoid dies. A player returns to Spectating when that event fires and the player has no character, or the character's humanoid health is already at 0. A living character is ignored.
+A player who joins is placed on the Spectating team. That team is black, which is the color of the `Spectate` spawn, so the player stands on it instead of falling from the default spawn. `Playing` is white, matching the match spawns, and it is not auto-assigned. When a match starts, players who have a character move to the Playing team. `StarterPlayerScripts.Client` starts `Died`, which fires `DiedEvent` each time that player's humanoid dies. A player returns to Spectating when that event fires and the player has no character, or the character's humanoid health is already at 0. A living character is ignored.
 
 ## Match start.
 The notice GUI tells everyone the server is waiting for players, then that the match is starting. The map and spawn points are cloned from `ServerStorage` into `Workspace.Game_Folder`. The bomb, `Sky`, and `WarSky` templates are cloned from `ServerStorage` as well. `Sky` and `WarSky` are parented to `Lighting`.
