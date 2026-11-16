@@ -1,3 +1,5 @@
+--!strict
+
 local Round = {}
 
 -- Servicios
@@ -10,58 +12,136 @@ local Teams = game:GetService("Teams");
 local Workspace = game:GetService("Workspace");
 
 -- Variables
-local plrs = {};
-local spects = {};
-local excludeNames = {"CenterTower", "FrontBridge", "RightBridge", "BackBridge", "LeftBridge", "Center"};
+local plrs: {Player} = {};
+local spects: {Player} = {};
+local excludeNames: {string} = {"CenterTower", "FrontBridge", "RightBridge", "BackBridge", "LeftBridge", "Center"};
 local restart = false;
 
-local gameFolder = Workspace.Game_Folder;
-local DiedEvent = RepStor:WaitForChild("DiedEvent");
-local Bomb = ServerStorage:WaitForChild("Bomb");
-local Map = ServerStorage:WaitForChild("Map");
-local Spawns = ServerStorage:WaitForChild("Spawns");
-local Sky = ServerStorage:WaitForChild("Sky");
-local WarSky = ServerStorage:WaitForChild("WarSky");
+local function requireInstance(parent: Instance, name: string): Instance
+	local child = parent:WaitForChild(name);
+	return child;
+end;
+
+local function requireBasePart(parent: Instance, name: string): BasePart
+	local child = parent:WaitForChild(name);
+	if not child:IsA("BasePart") then
+		error(name .. " must be a BasePart");
+	end;
+	return child;
+end;
+
+local function requireTeam(name: string): Team
+	local child = Teams:FindFirstChild(name);
+	if child == nil or not child:IsA("Team") then
+		error(name .. " team is missing");
+	end;
+	return child;
+end;
+
+local playingTeam = requireTeam("Playing");
+local spectatingTeam = requireTeam("Spectating");
+
+local gameFolder = requireInstance(Workspace, "Game_Folder");
+local diedEvent = requireInstance(RepStor, "DiedEvent");
+if not diedEvent:IsA("RemoteEvent") then
+	error("DiedEvent must be a RemoteEvent");
+end;
+local DiedEvent: RemoteEvent = diedEvent;
+local Bomb = requireInstance(ServerStorage, "Bomb");
+local Map = requireInstance(ServerStorage, "Map");
+local Spawns = requireInstance(ServerStorage, "Spawns");
+local Sky = requireInstance(ServerStorage, "Sky");
+local WarSky = requireInstance(ServerStorage, "WarSky");
+if not Sky:IsA("Sky") or not WarSky:IsA("Sky") then
+	error("Sky templates must be Sky instances");
+end;
 local isBomb = false;
 
+local function setNotice(player: Player, text: string)
+	local gui = player.PlayerGui:FindFirstChild("Notice");
+	if gui == nil then
+		return;
+	end;
+	local label = gui:FindFirstChild("TextLabel");
+	if label ~= nil and label:IsA("TextLabel") then
+		label.Text = text;
+	end;
+end;
+
+local function characterRoot(player: Player): BasePart?
+	local character = player.Character;
+	if character == nil then
+		return nil;
+	end;
+	local root = character:FindFirstChild("HumanoidRootPart");
+	if root ~= nil and root:IsA("BasePart") then
+		return root;
+	end;
+	return nil;
+end;
+
 -- Funciones
-local function addPlrToSpectsList(plr)
+local function addPlrToSpectsList(plr: Player)
 	table.insert(spects, plr);
-	plr.Team = Teams.Spectating;
+	plr.Team = spectatingTeam;
 end;
 
 local function addPlrsToPlrsList()
-	for i, v in pairs(spects) do
-		if v.Character then
-			table.insert(plrs, v);
-			v.Team = Teams.Playing;
+	for _, player in spects do
+		if player.Character then
+			table.insert(plrs, player);
+			player.Team = playingTeam;
 		end;
 	end;
 	table.clear(spects);
 end;
 
-local function removePlrFromList(plr)
-	if table.find(plrs, plr) ~= nil then
-		table.remove(plrs, table.find(plrs, plr));
-	else
-		table.remove(spects, table.find(spects, plr));
-	end
+local function removePlrFromList(plr: Player)
+	local playingIndex = table.find(plrs, plr);
+	if playingIndex ~= nil then
+		table.remove(plrs, playingIndex);
+		return;
+	end;
+	local spectatingIndex = table.find(spects, plr);
+	if spectatingIndex ~= nil then
+		table.remove(spects, spectatingIndex);
+	end;
 end;
 
 local function setBomb()
-	local randomplr = math.random(1, #plrs);
-	local bombchar = plrs[randomplr].Character;
-	bombchar.Humanoid.WalkSpeed = 30;
+	local carrier = plrs[math.random(1, #plrs)];
+	if carrier == nil then
+		return;
+	end;
+	local character = carrier.Character;
+	if character == nil then
+		return;
+	end;
+	local humanoid = character:FindFirstChildOfClass("Humanoid");
+	local rightHand = character:FindFirstChild("RightHand");
+	if humanoid == nil or rightHand == nil or not rightHand:IsA("BasePart") then
+		return;
+	end;
 
 	local bomb = Bomb:Clone();
+	if not bomb:IsA("BasePart") then
+		error("Bomb clone must be a BasePart");
+	end;
+	local plrname = bomb:FindFirstChild("plrname");
+	if plrname == nil or not plrname:IsA("StringValue") then
+		error("Bomb is missing plrname");
+	end;
+
+	humanoid.WalkSpeed = 30;
+
 	local weld = Instance.new("WeldConstraint");
-	weld.Part0 = bombchar.RightHand;
+	weld.Part0 = rightHand;
 	weld.Part1 = bomb;
 	weld.Parent = bomb;
 
-	bomb.plrname.Value = bombchar.Name;
-	bomb.CFrame = bombchar.RightHand.CFrame;
-	bomb.Parent = bombchar;
+	plrname.Value = character.Name;
+	bomb.CFrame = rightHand.CFrame;
+	bomb.Parent = character;
 	CollectionService:AddTag(bomb, "Bomb");
 end;
 
@@ -72,15 +152,13 @@ local function createMap()
 end;
 
 local function newGame()
-	for i, v in pairs(Players:GetPlayers()) do
-		local gui = v.PlayerGui:FindFirstChild("Notice");
-		if gui then
-			gui.TextLabel.Text = "Reinitialazing match";
-		end;
+	for _, player in Players:GetPlayers() do
+		setNotice(player, "Reinitialazing match");
 	end;
 
-	if Lighting.WarSky then
-		Lighting.WarSky:Destroy();
+	local activeWarSky = Lighting:FindFirstChild("WarSky");
+	if activeWarSky ~= nil then
+		activeWarSky:Destroy();
 	end;
 
 	gameFolder:ClearAllChildren();
@@ -91,8 +169,9 @@ local function newGame()
 end;
 
 local function onGame()
-	for i, plr in pairs(plrs) do
-		if plr.Character and plr.Character:FindFirstChild("Bomb") then
+	for _, player in plrs do
+		local character = player.Character;
+		if character ~= nil and character:FindFirstChild("Bomb") ~= nil then
 			isBomb = true
 		end;
 	end;
@@ -101,31 +180,37 @@ local function onGame()
 		setBomb();
 	end;
 
-	for i, v in pairs(Players:GetPlayers()) do
-		local gui = v.PlayerGui:FindFirstChild("Notice");
-		if gui then
-			gui.TextLabel.Text = "Remains ".. #plrs.. " Players";
-		end;
+	for _, player in Players:GetPlayers() do
+		setNotice(player, "Remains ".. #plrs.. " Players");
 	end;
 
 	if #plrs == 1 then
-		if plrs[1].Character.Bomb then
-			plrs[1].Character.Bomb:Destroy();
+		local winner = plrs[1];
+		assert(winner ~= nil, "Winner is missing");
+		local character = winner.Character;
+		if character ~= nil then
+			local bomb = character:FindFirstChild("Bomb");
+			if bomb ~= nil then
+				bomb:Destroy();
+			end;
 		end;
 
-		for i, v in pairs(Players:GetPlayers()) do
-			local gui = v.PlayerGui:FindFirstChild("Notice");
-			if gui then
-				gui.TextLabel.Text = plrs[1].Name.. " Won the game!";
-			end;
+		for _, player in Players:GetPlayers() do
+			setNotice(player, winner.Name.. " Won the game!");
 		end;
 
 		task.wait(5);
 
-		plrs[1].Team = Teams.Spectating;
-		table.insert(spects, plrs[1]);
-		plrs[1].Character.HumanoidRootPart.CFrame = Workspace.Baseplate.Spectate.CFrame;
-		plrs[1].Character.Humanoid.WalkSpeed = 22;
+		winner.Team = spectatingTeam;
+		table.insert(spects, winner);
+		local root = characterRoot(winner);
+		local humanoid = if character ~= nil then character:FindFirstChildOfClass("Humanoid") else nil;
+		if root ~= nil then
+			root.CFrame = requireBasePart(requireInstance(Workspace, "Baseplate"), "Spectate").CFrame;
+		end;
+		if humanoid ~= nil then
+			humanoid.WalkSpeed = 22;
+		end;
 		table.clear(plrs);
 		
 		task.wait(3);
@@ -133,11 +218,8 @@ local function onGame()
 		newGame();
 
 	elseif #plrs == 0 then
-		for i, v in pairs(Players:GetPlayers()) do
-			local gui = v.PlayerGui:FindFirstChild("Notice");
-			if gui then
-				gui.TextLabel.Text = "No one won the game!";
-			end;
+		for _, player in Players:GetPlayers() do
+			setNotice(player, "No one won the game!");
 		end;
 		table.clear(plrs);
 
@@ -147,49 +229,61 @@ local function onGame()
 	end;
 end;
 
-local function startGame()
-	for i, v in pairs(Players:GetPlayers()) do
-		local gui = v.PlayerGui:FindFirstChild("Notice");
-		if gui then
-			gui.TextLabel.Text = "Waiting for Players";
+local function destroyChildrenExcept(parent: Instance)
+	for _, child in parent:GetChildren() do
+		if table.find(excludeNames, child.Name) == nil then
+			child:Destroy();
 		end;
+	end;
+end;
+
+local function startGame()
+	for _, player in Players:GetPlayers() do
+		setNotice(player, "Waiting for Players");
 	end;
 	
 	task.wait(20)
 	
 	repeat task.wait(1); until #spects >= 1
 		
-	for i, v in pairs(Players:GetPlayers()) do
-		local gui = v.PlayerGui:FindFirstChild("Notice");
-		if gui then
-			gui.TextLabel.Text = "Starting Match";
-		end;
+	for _, player in Players:GetPlayers() do
+		setNotice(player, "Starting Match");
 	end;
 	
 	addPlrsToPlrsList();
 	createMap();
 	
+	local spawnedMap = gameFolder:FindFirstChild("Map");
+	local spawnedSpawns = gameFolder:FindFirstChild("Spawns");
+	if spawnedMap == nil or spawnedSpawns == nil then
+		error("Cloned map or spawns are missing");
+	end;
+
 	if #plrs < 5 then
 		local newSky = WarSky:Clone();
 		newSky.Parent = Lighting;
-		for i, v in pairs(gameFolder.Map:GetChildren()) do
-			if table.find(excludeNames, v.Name) == nil then
-				v:Destroy();
-			end;
+		destroyChildrenExcept(spawnedMap);
+		destroyChildrenExcept(spawnedSpawns);
+		local center = spawnedSpawns:FindFirstChild("Center");
+		if center == nil or not center:IsA("BasePart") then
+			error("Center spawn must be a BasePart");
 		end;
-		for i, v in pairs(gameFolder.Spawns:GetChildren()) do
-			if table.find(excludeNames, v.Name) == nil then
-				v:Destroy();
+		for _, player in plrs do
+			local root = characterRoot(player);
+			if root ~= nil then
+				root.CFrame = center.CFrame;
 			end;
-		end;
-		for i, v in pairs(plrs) do
-			v.Character.HumanoidRootPart.CFrame = Workspace.Game_Folder.Spawns.Center.CFrame;
 		end;
 	else 
 		local newSky = Sky:Clone();
 		newSky.Parent = Lighting;
-		for i, v in pairs(Players:GetPlayers()) do
-			v.Character.HumanoidRootPart.CFrame = gameFolder.Spawns:GetChildren()[i].CFrame;
+		local spawnList = spawnedSpawns:GetChildren();
+		for index, player in Players:GetPlayers() do
+			local spawn = spawnList[index];
+			local root = characterRoot(player);
+			if spawn ~= nil and spawn:IsA("BasePart") and root ~= nil then
+				root.CFrame = spawn.CFrame;
+			end;
 		end;
 	end;
 	
@@ -197,23 +291,23 @@ local function startGame()
 end;
 
 function Round.start()
-	Players.PlayerAdded:Connect(function(plr)
+	Players.PlayerAdded:Connect(function(plr: Player)
 		addPlrToSpectsList(plr);
 	end);
-	Players.PlayerRemoving:Connect(function(plr)
+	Players.PlayerRemoving:Connect(function(plr: Player)
 		removePlrFromList(plr);
 	end);
 
-	DiedEvent.OnServerEvent:Connect(function(dPlayer)
+	DiedEvent.OnServerEvent:Connect(function(dPlayer: Player)
 		local character = dPlayer.Character;
-		local humanoid = character and character:FindFirstChildOfClass("Humanoid");
+		local humanoid = if character ~= nil then character:FindFirstChildOfClass("Humanoid") else nil;
 		if character ~= nil and (humanoid == nil or humanoid.Health > 0) then
 			return;
 		end;
 
 		removePlrFromList(dPlayer);
 		table.insert(spects, dPlayer);
-		dPlayer.Team = Teams.Spectating;
+		dPlayer.Team = spectatingTeam;
 	end);
 
 	startGame();
