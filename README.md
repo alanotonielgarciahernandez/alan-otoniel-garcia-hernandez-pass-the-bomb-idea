@@ -69,7 +69,7 @@ With the place open in Studio, run this in the command bar:
 require(game.ServerScriptService.Tests).start()
 ```
 
-The tests check the player lists and `GameMap.characterRoot`. They do not start a round. Run them before a match, while both player lists are empty.
+The tests check the player lists, `GameMap.characterRoot`, and whether a character is carrying a tagged bomb. They do not start a round. Run them before a match, while both player lists are empty.
 
 # Functions
 The gameplay below is copied from the original game. One player carries a bomb, eliminated players leave the round, and the match restarts after a winner is announced. Sudden death starts when 1 to 4 players remain.
