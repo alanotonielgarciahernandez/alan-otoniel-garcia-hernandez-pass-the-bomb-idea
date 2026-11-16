@@ -47,6 +47,21 @@ return {
 		end,
 	},
 	{
+		name = "spectateCFrame is above the top of the Spectate part",
+		run = function()
+			local baseplate = workspace:FindFirstChild("Baseplate")
+			local spectate = if baseplate ~= nil then baseplate:FindFirstChild("Spectate") else nil
+			if spectate == nil or not spectate:IsA("BasePart") then
+				error("Spectate spawn is missing")
+			end
+			local destination = GameMap.spectateCFrame()
+			local localOffset = spectate.CFrame:PointToObjectSpace(destination.Position)
+			local minimumHeight = spectate.Size.Y / 2
+			assert(localOffset.Y > minimumHeight, "spectate position is not above the part")
+			assert(math.abs(localOffset.X) < 0.01 and math.abs(localOffset.Z) < 0.01, "spectate position is not centered over the part")
+		end,
+	},
+	{
 		name = "characterRoot returns the HumanoidRootPart",
 		run = function()
 			local player = makePlayer(true)

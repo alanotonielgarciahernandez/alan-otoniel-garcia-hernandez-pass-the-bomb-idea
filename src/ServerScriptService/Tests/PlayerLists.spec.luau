@@ -81,6 +81,30 @@ return {
 		end,
 	},
 	{
+		name = "addSpectator does not record the same player twice",
+		run = function()
+			if #PlayerLists.spectators() > 0 or #PlayerLists.playing() > 0 then
+				error("run this test while both player lists are empty")
+			end
+			local player = makePlayer("Twice", false)
+			local ok, err = pcall(function()
+				PlayerLists.addSpectator(asPlayer(player))
+				PlayerLists.addSpectator(asPlayer(player))
+				local copies = 0
+				for _, spectator in PlayerLists.spectators() do
+					if spectator == asPlayer(player) then
+						copies += 1
+					end
+				end
+				assert(copies == 1, "player was recorded more than once")
+			end)
+			cleanup(player)
+			if not ok then
+				error(err)
+			end
+		end,
+	},
+	{
 		name = "remove drops a player from playing or spectators",
 		run = function()
 			if #PlayerLists.spectators() > 0 or #PlayerLists.playing() > 0 then

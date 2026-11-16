@@ -39,8 +39,12 @@ function GameMap.characterRoot(player: Player): BasePart?
 	return nil
 end
 
+local SPECTATE_CLEARANCE = 5
+
 function GameMap.spectateCFrame(): CFrame
-	return requireBasePart(requireInstance(Workspace, "Baseplate"), "Spectate").CFrame
+	local spectate = requireBasePart(requireInstance(Workspace, "Baseplate"), "Spectate")
+	local aboveTop = spectate.Size.Y / 2 + SPECTATE_CLEARANCE
+	return spectate.CFrame * CFrame.new(0, aboveTop, 0)
 end
 
 function GameMap.clear()

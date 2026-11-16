@@ -28,7 +28,9 @@ function PlayerLists.spectators(): {Player}
 end
 
 function PlayerLists.addSpectator(player: Player)
-	table.insert(spectators, player)
+	if table.find(spectators, player) == nil then
+		table.insert(spectators, player)
+	end
 	player.Team = spectatingTeam
 end
 

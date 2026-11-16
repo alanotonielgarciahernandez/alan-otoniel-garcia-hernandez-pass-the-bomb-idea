@@ -57,8 +57,9 @@ if not diedEvent:IsA("RemoteEvent") then
 	error("DiedEvent must be a RemoteEvent")
 end
 local DiedEvent: RemoteEvent = diedEvent
-local isBomb = false
 local restart = false
+local matchLive = false
+local resolving = false
 
 local function newGame()
 	for _, player in Players:GetPlayers() do
@@ -66,29 +67,39 @@ local function newGame()
 	end
 
 	GameMap.clear()
-	isBomb = false
+	matchLive = false
 	task.wait(1)
 
 	restart = true
 end
 
-local function onGame()
+local function someoneCarriesBomb(): boolean
 	for _, player in playingPlayers do
 		local character = player.Character
 		if character ~= nil and Bomb.isCarriedBy(character) then
-			isBomb = true
+			return true
 		end
 	end
+	return false
+end
 
-	if isBomb == false and #playingPlayers >= 1 then
+local function onGame()
+	if not matchLive or resolving then
+		return
+	end
+	resolving = true
+
+	local remaining = #playingPlayers
+	if remaining >= 2 and not someoneCarriesBomb() then
 		Bomb.give(playingPlayers)
 	end
 
 	for _, player in Players:GetPlayers() do
-		Notice.set(player, "Remains " .. #playingPlayers .. " Players")
+		Notice.set(player, "Remains " .. remaining .. " Players")
 	end
 
-	if #playingPlayers == 1 then
+	if remaining == 1 then
+		matchLive = false
 		local winner = playingPlayers[1]
 		assert(winner ~= nil, "Winner is missing")
 		local character = winner.Character
@@ -117,7 +128,8 @@ local function onGame()
 		task.wait(3)
 
 		newGame()
-	elseif #playingPlayers == 0 then
+	elseif remaining == 0 then
+		matchLive = false
 		for _, player in Players:GetPlayers() do
 			Notice.set(player, "No one won the game!")
 		end
@@ -127,6 +139,8 @@ local function onGame()
 
 		newGame()
 	end
+
+	resolving = false
 end
 
 local function startGame()
@@ -147,6 +161,7 @@ local function startGame()
 	PlayerLists.moveSpectatorsToPlaying()
 	GameMap.create()
 	GameMap.beginRound(playingPlayers)
+	matchLive = true
 	onGame()
 end
 
@@ -158,8 +173,16 @@ function Round.start()
 			return
 		end
 
+		if character ~= nil then
+			Bomb.removeFrom(character)
+		end
 		PlayerLists.remove(player)
 		PlayerLists.addSpectator(player)
+		onGame()
+	end)
+
+	Players.PlayerRemoving:Connect(function(_player: Player)
+		onGame()
 	end)
 
 	startGame()
@@ -168,6 +191,8 @@ function Round.start()
 		if restart == true then
 			restart = false
 			startGame()
+		elseif matchLive then
+			onGame()
 		end
 	end
 end
