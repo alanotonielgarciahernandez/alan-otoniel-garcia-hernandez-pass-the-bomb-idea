@@ -80,7 +80,7 @@ local function newGame()
 
 	gameFolder:ClearAllChildren();
 	isBomb = false;
-	wait(1);
+	task.wait(1);
 	
 	restart = true;
 end;
@@ -115,7 +115,7 @@ local function onGame()
 			end;
 		end;
 
-		wait(5);
+		task.wait(5);
 
 		plrs[1].Team = game.Teams.Spectating;
 		table.insert(spects, plrs[1]);
@@ -123,7 +123,7 @@ local function onGame()
 		plrs[1].Character.Humanoid.WalkSpeed = 22;
 		table.clear(plrs);
 		
-		wait(3);
+		task.wait(3);
 		
 		newGame();
 
@@ -136,7 +136,7 @@ local function onGame()
 		end;
 		table.clear(plrs);
 
-		wait(3);
+		task.wait(3);
 		
 		newGame();
 	end;
@@ -150,9 +150,9 @@ local function startGame()
 		end;
 	end;
 	
-	wait(20)
+	task.wait(20)
 	
-	repeat wait(1); until #spects >= 1
+	repeat task.wait(1); until #spects >= 1
 		
 	for i, v in pairs(Players:GetPlayers()) do
 		local gui = v.PlayerGui:FindFirstChild("Notice");
@@ -207,7 +207,7 @@ function Round.start()
 
 	startGame();
 
-	while wait(1) do
+	while task.wait(1) do
 		if restart == true then
 			restart = false;
 			startGame();
