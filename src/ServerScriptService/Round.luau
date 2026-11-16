@@ -1,9 +1,11 @@
 local Round = {}
 
 -- Servicios
+local Lighting = game:GetService("Lighting");
 local Players = game:GetService("Players");
 local RepStor = game:GetService("ReplicatedStorage");
 local Teams = game:GetService("Teams");
+local Workspace = game:GetService("Workspace");
 
 -- Variables
 local plrs = {};
@@ -11,7 +13,7 @@ local spects = {};
 local excludeNames = {"CenterTower", "FrontBridge", "RightBridge", "BackBridge", "LeftBridge", "Center"};
 local restart = false;
 
-local gameFolder = game.Workspace.Game_Folder;
+local gameFolder = Workspace.Game_Folder;
 local DiedEvent = RepStor:WaitForChild("DiedEvent");
 local Map = RepStor:WaitForChild("Map");
 local Spawns = RepStor:WaitForChild("Spawns");
@@ -74,8 +76,8 @@ local function newGame()
 		end;
 	end;
 
-	if game.Lighting.WarSky then
-		game.Lighting.WarSky:Destroy();
+	if Lighting.WarSky then
+		Lighting.WarSky:Destroy();
 	end;
 
 	gameFolder:ClearAllChildren();
@@ -117,9 +119,9 @@ local function onGame()
 
 		task.wait(5);
 
-		plrs[1].Team = game.Teams.Spectating;
+		plrs[1].Team = Teams.Spectating;
 		table.insert(spects, plrs[1]);
-		plrs[1].Character.HumanoidRootPart.CFrame = game.Workspace.Baseplate.Spectate.CFrame;
+		plrs[1].Character.HumanoidRootPart.CFrame = Workspace.Baseplate.Spectate.CFrame;
 		plrs[1].Character.Humanoid.WalkSpeed = 22;
 		table.clear(plrs);
 		
@@ -166,7 +168,7 @@ local function startGame()
 	
 	if #plrs < 5 then
 		local newSky = WarSky:Clone();
-		newSky.Parent = game.Lighting;
+		newSky.Parent = Lighting;
 		for i, v in pairs(gameFolder.Map:GetChildren()) do
 			if table.find(excludeNames, v.Name) == nil then
 				v:Destroy();
@@ -178,11 +180,11 @@ local function startGame()
 			end;
 		end;
 		for i, v in pairs(plrs) do
-			v.Character.HumanoidRootPart.CFrame = game.Workspace.Game_Folder.Spawns.Center.CFrame;
+			v.Character.HumanoidRootPart.CFrame = Workspace.Game_Folder.Spawns.Center.CFrame;
 		end;
 	else 
 		local newSky = Sky:Clone();
-		newSky.Parent = game.Lighting;
+		newSky.Parent = Lighting;
 		for i, v in pairs(Players:GetPlayers()) do
 			v.Character.HumanoidRootPart.CFrame = gameFolder.Spawns:GetChildren()[i].CFrame;
 		end;
