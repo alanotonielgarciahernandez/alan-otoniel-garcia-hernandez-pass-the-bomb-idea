@@ -1,3 +1,5 @@
+local Round = {}
+
 -- Servicios
 local Players = game:GetService("Players");
 local RepStor = game:GetService("ReplicatedStorage");
@@ -189,25 +191,28 @@ local function startGame()
 	onGame();
 end;
 
--- Run
-Players.PlayerAdded:Connect(function(plr)
-	addPlrToSpectsList(plr);
-end);
-Players.PlayerRemoving:Connect(function(plr)
-	removePlrFromList(plr);
-end);
+function Round.start()
+	Players.PlayerAdded:Connect(function(plr)
+		addPlrToSpectsList(plr);
+	end);
+	Players.PlayerRemoving:Connect(function(plr)
+		removePlrFromList(plr);
+	end);
 
-DiedEvent.OnServerEvent:Connect(function(dPlayer)
-	removePlrFromList(dPlayer);
-	table.insert(spects, dPlayer);
-	dPlayer.Team = Teams.Spectating;
-end);
+	DiedEvent.OnServerEvent:Connect(function(dPlayer)
+		removePlrFromList(dPlayer);
+		table.insert(spects, dPlayer);
+		dPlayer.Team = Teams.Spectating;
+	end);
 
-startGame();
+	startGame();
 
-while wait(1) do
-	if restart == true then
-		restart = false;
-		startGame();
+	while wait(1) do
+		if restart == true then
+			restart = false;
+			startGame();
+		end;
 	end;
-end;
+end
+
+return Round
