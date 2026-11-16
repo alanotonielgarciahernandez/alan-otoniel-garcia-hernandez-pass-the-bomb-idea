@@ -4,6 +4,7 @@ local Round = {}
 local Lighting = game:GetService("Lighting");
 local Players = game:GetService("Players");
 local RepStor = game:GetService("ReplicatedStorage");
+local ServerStorage = game:GetService("ServerStorage");
 local Teams = game:GetService("Teams");
 local Workspace = game:GetService("Workspace");
 
@@ -15,10 +16,11 @@ local restart = false;
 
 local gameFolder = Workspace.Game_Folder;
 local DiedEvent = RepStor:WaitForChild("DiedEvent");
-local Map = RepStor:WaitForChild("Map");
-local Spawns = RepStor:WaitForChild("Spawns");
-local Sky = RepStor:WaitForChild("Sky");
-local WarSky = RepStor:WaitForChild("WarSky");
+local Bomb = ServerStorage:WaitForChild("Bomb");
+local Map = ServerStorage:WaitForChild("Map");
+local Spawns = ServerStorage:WaitForChild("Spawns");
+local Sky = ServerStorage:WaitForChild("Sky");
+local WarSky = ServerStorage:WaitForChild("WarSky");
 local isBomb = false;
 
 -- Funciones
@@ -50,7 +52,7 @@ local function setBomb()
 	local bombchar = plrs[randomplr].Character;
 	bombchar.Humanoid.WalkSpeed = 30;
 
-	local bomb = RepStor:WaitForChild("Bomb"):Clone();
+	local bomb = Bomb:Clone();
 	local weld = Instance.new("WeldConstraint");
 	weld.Part0 = bombchar.RightHand;
 	weld.Part1 = bomb;

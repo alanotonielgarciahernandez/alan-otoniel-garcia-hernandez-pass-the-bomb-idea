@@ -69,7 +69,7 @@ The gameplay below is copied from the original game. One player carries a bomb, 
 A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. A player returns to Spectating when `DiedEvent` fires and that player has no character, or the character's humanoid health is already at 0. A living character is ignored.
 
 ## Match start.
-The notice GUI tells everyone the server is waiting for players, then that the match is starting. The map and spawn points are cloned from `ReplicatedStorage` into `Workspace.Game_Folder`.
+The notice GUI tells everyone the server is waiting for players, then that the match is starting. The map and spawn points are cloned from `ServerStorage` into `Workspace.Game_Folder`. The bomb, `Sky`, and `WarSky` templates are cloned from `ServerStorage` as well. `Sky` and `WarSky` are parented to `Lighting`.
 
 Sudden death applies with fewer than five players. Towers and outer spawns are removed, and everyone starts at the center under `WarSky`. With five or more players, the full map stays and each player is sent to a spawn under `Sky`.
 
