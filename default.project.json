@@ -34,9 +34,7 @@
         "Technology": "ShadowMap",
         "TimeOfDay": "14:30:00"
       },
-      "$path": "src/Lighting",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/Lighting"    },
     "ReplicatedFirst": {
       "$className": "ReplicatedFirst",
       "$properties": {
@@ -44,9 +42,7 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ReplicatedFirst",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/ReplicatedFirst"    },
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "$properties": {
@@ -54,9 +50,7 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ReplicatedStorage",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/ReplicatedStorage"    },
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "$properties": {
@@ -73,9 +67,7 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ServerStorage",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/ServerStorage"    },
     "StarterGui": {
       "$className": "StarterGui",
       "$properties": {
@@ -84,9 +76,7 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/StarterGui",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/StarterGui"    },
     "StarterPack": {
       "$className": "StarterPack",
       "$properties": {
@@ -94,9 +84,7 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/StarterPack",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/StarterPack"    },
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "$properties": {
@@ -111,9 +99,7 @@
           "Enum": 0
         }
       },
-      "$path": "src/StarterPlayer",
-      "$ignoreUnknownInstances": true
-    },
+      "$path": "src/StarterPlayer"    },
     "Workspace": {
       "$className": "Workspace",
       "$properties": {
@@ -153,9 +139,7 @@
           }
         }
       },
-      "$path": "src/Workspace",
-      "$ignoreUnknownInstances": true
-    }
+      "$path": "src/Workspace"    }
   },
   "syncbackRules": {
     "syncCurrentCamera": false
