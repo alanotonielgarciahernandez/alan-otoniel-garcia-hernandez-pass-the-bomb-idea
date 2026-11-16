@@ -2,11 +2,9 @@
 
 local Round = {}
 
-local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local ServerStorage = game:GetService("ServerStorage")
 
 type NoticeModule = {
 	set: (player: Player, text: string) -> (),
@@ -19,6 +17,11 @@ type PlayerListsModule = {
 	addSpectator: (player: Player) -> (),
 	moveSpectatorsToPlaying: () -> (),
 	remove: (player: Player) -> (),
+	start: () -> (),
+}
+
+type BombModule = {
+	give: (playingPlayers: {Player}) -> (),
 	start: () -> (),
 }
 
@@ -39,6 +42,7 @@ local function requireModule(name: string): any
 	return require(child)
 end
 
+local Bomb = requireModule("Bomb") :: BombModule
 local Notice = requireModule("Notice") :: NoticeModule
 local PlayerLists = requireModule("PlayerLists") :: PlayerListsModule
 local GameMap = requireModule("GameMap") :: GameMapModule
@@ -51,46 +55,8 @@ if not diedEvent:IsA("RemoteEvent") then
 	error("DiedEvent must be a RemoteEvent")
 end
 local DiedEvent: RemoteEvent = diedEvent
-local Bomb = ServerStorage:WaitForChild("Bomb")
 local isBomb = false
 local restart = false
-
-local function setBomb()
-	local carrier = playingPlayers[math.random(1, #playingPlayers)]
-	if carrier == nil then
-		return
-	end
-	local character = carrier.Character
-	if character == nil then
-		return
-	end
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	local rightHand = character:FindFirstChild("RightHand")
-	if humanoid == nil or rightHand == nil or not rightHand:IsA("BasePart") then
-		return
-	end
-
-	local bomb = Bomb:Clone()
-	if not bomb:IsA("BasePart") then
-		error("Bomb clone must be a BasePart")
-	end
-	local playerName = bomb:FindFirstChild("plrname")
-	if playerName == nil or not playerName:IsA("StringValue") then
-		error("Bomb is missing plrname")
-	end
-
-	humanoid.WalkSpeed = 30
-
-	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = rightHand
-	weld.Part1 = bomb
-	weld.Parent = bomb
-
-	playerName.Value = character.Name
-	bomb.CFrame = rightHand.CFrame
-	bomb.Parent = character
-	CollectionService:AddTag(bomb, "Bomb")
-end
 
 local function newGame()
 	for _, player in Players:GetPlayers() do
@@ -113,7 +79,7 @@ local function onGame()
 	end
 
 	if isBomb == false and #playingPlayers >= 1 then
-		setBomb()
+		Bomb.give(playingPlayers)
 	end
 
 	for _, player in Players:GetPlayers() do

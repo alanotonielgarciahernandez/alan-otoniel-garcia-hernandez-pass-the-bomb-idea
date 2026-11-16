@@ -169,6 +169,35 @@ local function runBomb(instance: Instance)
 	end)
 end
 
+function BombService.give(playingPlayers: {Player})
+	local carrier = playingPlayers[math.random(1, #playingPlayers)]
+	if carrier == nil then
+		return
+	end
+	local character = carrier.Character
+	if character == nil then
+		return
+	end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local rightHand = character:FindFirstChild("RightHand")
+	if humanoid == nil or rightHand == nil or not rightHand:IsA("BasePart") then
+		return
+	end
+
+	local bomb = asBomb(bombTemplate:Clone())
+	humanoid.WalkSpeed = 30
+
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = rightHand
+	weld.Part1 = bomb
+	weld.Parent = bomb
+
+	bomb.plrname.Value = character.Name
+	bomb.CFrame = rightHand.CFrame
+	bomb.Parent = character
+	CollectionService:AddTag(bomb, BOMB_TAG)
+end
+
 function BombService.start()
 	CollectionService:GetInstanceAddedSignal(BOMB_TAG):Connect(runBomb)
 	for _, bomb in CollectionService:GetTagged(BOMB_TAG) do
