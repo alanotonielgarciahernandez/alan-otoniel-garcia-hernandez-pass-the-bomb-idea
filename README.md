@@ -16,13 +16,13 @@ The copy includes:
 - A round system. One player carries the bomb, and the last remaining player wins.
 - Sudden death when 1 to 4 players remain. The outer map is removed and everyone starts at the center.
 
-`Server.server.luau` is the only enabled server script. It requires `Round.luau` and calls `Round.start()`. `Game.server.luau` is an earlier version of that loop and stays disabled.
+`Server.server.luau` is the only server script. It requires `Round.luau` and calls `Round.start()`.
 
 ## How has this project helped me build my portfolio?
 The repository shows a published Roblox place with its map, teams, notice GUI, and bomb round saved as source files. The design belongs to the original game. What this project shows is that I could stand that copy up and keep it in Git.
 
 ## How has this project helped me test and expand my knowledge?
-Building the copy was a way to practice Roblox gameplay in a place that already had a map and rules. Exporting it with Rojo then let me read the Luau round scripts next to the model files for the map, bomb, spawns, and GUI.
+Building the copy was a way to practice Roblox gameplay in a place that already had a map and rules. Exporting it with Rojo then let me read the Luau round module next to the model files for the map, bomb, spawns, and GUI.
 
 ## How has this project helped to test and expand my skills?
 The enabled round script keeps track of who is playing, who is spectating, when the bomb is missing, and when the match should restart. Splitting that loop into functions made those rules easier to follow than in my first script.
