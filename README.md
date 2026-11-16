@@ -75,7 +75,7 @@ The tests check the player lists and `GameMap.characterRoot`. They do not start 
 The gameplay below is copied from the original game. One player carries a bomb, eliminated players leave the round, and the match restarts after a winner is announced. Sudden death starts when 1 to 4 players remain.
 
 ## Joining and teams.
-A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. A player returns to Spectating when `DiedEvent` fires and that player has no character, or the character's humanoid health is already at 0. A living character is ignored.
+A player who joins is placed on the Spectating team. When a match starts, players who have a character move to the Playing team. `StarterPlayerScripts.Client` starts `Died`, which fires `DiedEvent` when that player's first humanoid dies. A player returns to Spectating when that event fires and the player has no character, or the character's humanoid health is already at 0. A living character is ignored.
 
 ## Match start.
 The notice GUI tells everyone the server is waiting for players, then that the match is starting. The map and spawn points are cloned from `ServerStorage` into `Workspace.Game_Folder`. The bomb, `Sky`, and `WarSky` templates are cloned from `ServerStorage` as well. `Sky` and `WarSky` are parented to `Lighting`.
