@@ -1,6 +1,7 @@
 local Round = {}
 
 -- Servicios
+local CollectionService = game:GetService("CollectionService");
 local Lighting = game:GetService("Lighting");
 local Players = game:GetService("Players");
 local RepStor = game:GetService("ReplicatedStorage");
@@ -61,7 +62,7 @@ local function setBomb()
 	bomb.plrname.Value = bombchar.Name;
 	bomb.CFrame = bombchar.RightHand.CFrame;
 	bomb.Parent = bombchar;
-	bomb.BombScript.Disabled = false;
+	CollectionService:AddTag(bomb, "Bomb");
 end;
 
 local function createMap()

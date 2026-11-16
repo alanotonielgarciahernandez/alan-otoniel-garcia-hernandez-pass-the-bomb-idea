@@ -74,7 +74,7 @@ The notice GUI tells everyone the server is waiting for players, then that the m
 Sudden death applies with fewer than five players. Towers and outer spawns are removed, and everyone starts at the center under `WarSky`. With five or more players, the full map stays and each player is sent to a spawn under `Sky`.
 
 ## The bomb.
-`setBomb` picks a playing character, raises that character's walk speed, and welds a clone of `Bomb` to the right hand. If nobody is still carrying the bomb and at least one player remains, another player receives it.
+`setBomb` picks a playing character, raises that character's walk speed, and welds a clone of `Bomb` to the right hand. It tags that clone, and `Bomb.luau` handles a touch that passes the bomb and the timer that ends in an explosion. If nobody is still carrying the bomb and at least one player remains, another player receives it.
 
 ## Round end.
 The notice GUI shows how many players remain. One player left wins, and that player's name is shown. Zero players left ends the round with no winner. The map is cleared, the carrier returns to the spectate point, and the next match starts.
