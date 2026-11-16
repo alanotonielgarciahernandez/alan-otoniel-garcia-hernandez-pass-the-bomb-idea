@@ -53,7 +53,7 @@ Restart Studio after installing the plugin.
 ```sh
 rojo serve
 ```
-In Studio, connect the Rojo plugin to the server. The plugin syncs `src` into the open place.
+In Studio, connect the Rojo plugin to the server. The plugin syncs `src` into the open place. `Workspace`, `Lighting`, `ReplicatedFirst`, `ReplicatedStorage`, `ServerStorage`, `StarterGui`, `StarterPack`, and `StarterPlayer` keep instances that are not in `src`. `ServerScriptService` does not: a script removed from the repository is removed from the place.
 
 ## Build the project
 Open a shell and run the command below to build a place file from this repository.

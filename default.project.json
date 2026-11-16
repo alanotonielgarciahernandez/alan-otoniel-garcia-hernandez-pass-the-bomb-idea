@@ -34,7 +34,8 @@
         "Technology": "ShadowMap",
         "TimeOfDay": "14:30:00"
       },
-      "$path": "src/Lighting"
+      "$path": "src/Lighting",
+      "$ignoreUnknownInstances": true
     },
     "ReplicatedFirst": {
       "$className": "ReplicatedFirst",
@@ -43,7 +44,8 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ReplicatedFirst"
+      "$path": "src/ReplicatedFirst",
+      "$ignoreUnknownInstances": true
     },
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
@@ -52,7 +54,8 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ReplicatedStorage"
+      "$path": "src/ReplicatedStorage",
+      "$ignoreUnknownInstances": true
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
@@ -70,7 +73,8 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/ServerStorage"
+      "$path": "src/ServerStorage",
+      "$ignoreUnknownInstances": true
     },
     "StarterGui": {
       "$className": "StarterGui",
@@ -80,7 +84,8 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/StarterGui"
+      "$path": "src/StarterGui",
+      "$ignoreUnknownInstances": true
     },
     "StarterPack": {
       "$className": "StarterPack",
@@ -89,7 +94,8 @@
           "BinaryString": ""
         }
       },
-      "$path": "src/StarterPack"
+      "$path": "src/StarterPack",
+      "$ignoreUnknownInstances": true
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
@@ -105,7 +111,8 @@
           "Enum": 0
         }
       },
-      "$path": "src/StarterPlayer"
+      "$path": "src/StarterPlayer",
+      "$ignoreUnknownInstances": true
     },
     "Workspace": {
       "$className": "Workspace",
@@ -146,7 +153,8 @@
           }
         }
       },
-      "$path": "src/Workspace"
+      "$path": "src/Workspace",
+      "$ignoreUnknownInstances": true
     }
   },
   "syncbackRules": {
