@@ -190,23 +190,79 @@ local function startGame()
 	onGame()
 end
 
-function Round.start()
-	DiedEvent.OnServerEvent:Connect(function(player: Player)
-		local character = player.Character
-		local humanoid = if character ~= nil then character:FindFirstChildOfClass("Humanoid") else nil
-		if character ~= nil and (humanoid == nil or humanoid.Health > 0) then
+local watchedCharacters: { [Model]: boolean } = {}
+local watchedPlayers: { [Player]: boolean } = {}
+
+local function eliminateIfDead(player: Player)
+	local character = player.Character
+	local humanoid = if character ~= nil then character:FindFirstChildOfClass("Humanoid") else nil
+	if character == nil or humanoid == nil or humanoid.Health > 0 then
+		return
+	end
+	if table.find(playingPlayers, player) == nil then
+		return
+	end
+
+	Bomb.removeFrom(character)
+	PlayerLists.remove(player)
+	PlayerLists.addSpectator(player)
+	onGame()
+end
+
+local function watchCharacter(player: Player, character: Model)
+	if watchedCharacters[character] then
+		return
+	end
+	watchedCharacters[character] = true
+	character.Destroying:Connect(function()
+		watchedCharacters[character] = nil
+	end)
+
+	task.spawn(function()
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if humanoid == nil then
+			local child = character:WaitForChild("Humanoid", 10)
+			if child ~= nil and child:IsA("Humanoid") then
+				humanoid = child
+			end
+		end
+		if humanoid == nil or watchedCharacters[character] ~= true then
 			return
 		end
 
-		if character ~= nil then
-			Bomb.removeFrom(character)
+		humanoid.Died:Connect(function()
+			eliminateIfDead(player)
+		end)
+		if humanoid.Health <= 0 then
+			eliminateIfDead(player)
 		end
-		PlayerLists.remove(player)
-		PlayerLists.addSpectator(player)
-		onGame()
 	end)
+end
 
-	Players.PlayerRemoving:Connect(function(_player: Player)
+local function watchPlayer(player: Player)
+	if watchedPlayers[player] then
+		return
+	end
+	watchedPlayers[player] = true
+	player.CharacterAdded:Connect(function(character: Model)
+		watchCharacter(player, character)
+	end)
+	local character = player.Character
+	if character ~= nil then
+		watchCharacter(player, character)
+	end
+end
+
+function Round.start()
+	DiedEvent.OnServerEvent:Connect(eliminateIfDead)
+
+	Players.PlayerAdded:Connect(watchPlayer)
+	for _, player in Players:GetPlayers() do
+		watchPlayer(player)
+	end
+
+	Players.PlayerRemoving:Connect(function(player: Player)
+		watchedPlayers[player] = nil
 		onGame()
 	end)
 

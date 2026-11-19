@@ -35,13 +35,17 @@ function PlayerLists.addSpectator(player: Player)
 end
 
 function PlayerLists.moveSpectatorsToPlaying()
-	for _, player in spectators do
-		if player.Character then
+	local index = 1
+	while index <= #spectators do
+		local player = spectators[index]
+		if player.Character ~= nil then
+			table.remove(spectators, index)
 			table.insert(playingPlayers, player)
 			player.Team = playingTeam
+		else
+			index += 1
 		end
 	end
-	table.clear(spectators)
 end
 
 function PlayerLists.remove(player: Player)
@@ -57,9 +61,14 @@ function PlayerLists.remove(player: Player)
 end
 
 function PlayerLists.start()
-	Players.PlayerAdded:Connect(function(player: Player)
+	local function join(player: Player)
 		PlayerLists.addSpectator(player)
-	end)
+	end
+
+	Players.PlayerAdded:Connect(join)
+	for _, player in Players:GetPlayers() do
+		join(player)
+	end
 	Players.PlayerRemoving:Connect(function(player: Player)
 		PlayerLists.remove(player)
 	end)
