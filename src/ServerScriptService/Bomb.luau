@@ -108,10 +108,11 @@ local function runBomb(instance: Instance)
 		newBomb.Parent = character
 		humanoid.WalkSpeed = 30
 		CollectionService:AddTag(newBomb, BOMB_TAG)
-		task.wait(2)
-		if newBomb.Parent ~= nil then
-			newBomb.db.Value = false
-		end
+		task.delay(2, function()
+			if newBomb.Parent ~= nil then
+				newBomb.db.Value = false
+			end
+		end)
 	end)
 
 	task.spawn(function()
