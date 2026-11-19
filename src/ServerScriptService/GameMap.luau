@@ -58,12 +58,17 @@ function GameMap.spectateCFrame(): CFrame
 	return spectate.CFrame * CFrame.new(0, aboveTop, 0)
 end
 
+local function clearRoundSky()
+	for _, child in Lighting:GetChildren() do
+		if child:IsA("Sky") then
+			child:Destroy()
+		end
+	end
+end
+
 function GameMap.clear()
 	assert(gameFolder ~= nil, "GameMap.start was not called")
-	local activeWarSky = Lighting:FindFirstChild("WarSky")
-	if activeWarSky ~= nil then
-		activeWarSky:Destroy()
-	end
+	clearRoundSky()
 	gameFolder:ClearAllChildren()
 end
 
@@ -90,6 +95,7 @@ function GameMap.beginRound(playing: {Player})
 		error("Cloned map or spawns are missing")
 	end
 
+	clearRoundSky()
 	if #playing < 5 then
 		local newSky = warSkyTemplate:Clone()
 		newSky.Parent = Lighting
