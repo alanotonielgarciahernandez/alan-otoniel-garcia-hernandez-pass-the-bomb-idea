@@ -3,7 +3,6 @@
 local GameMap = {}
 
 local Lighting = game:GetService("Lighting")
-local Players = game:GetService("Players")
 local ServerStorage = game:GetService("ServerStorage")
 local Workspace = game:GetService("Workspace")
 
@@ -37,6 +36,18 @@ function GameMap.characterRoot(player: Player): BasePart?
 		return root
 	end
 	return nil
+end
+
+local function livingRoot(player: Player): BasePart?
+	local character = player.Character
+	if character == nil then
+		return nil
+	end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid == nil or humanoid.Health <= 0 then
+		return nil
+	end
+	return GameMap.characterRoot(player)
 end
 
 local SPECTATE_CLEARANCE = 5
@@ -89,7 +100,7 @@ function GameMap.beginRound(playing: {Player})
 			error("Center spawn must be a BasePart")
 		end
 		for _, player in playing do
-			local root = GameMap.characterRoot(player)
+			local root = livingRoot(player)
 			if root ~= nil then
 				root.CFrame = center.CFrame
 			end
@@ -97,12 +108,19 @@ function GameMap.beginRound(playing: {Player})
 	else
 		local newSky = skyTemplate:Clone()
 		newSky.Parent = Lighting
-		local spawnList = spawnedSpawns:GetChildren()
-		for index, player in Players:GetPlayers() do
-			local spawn = spawnList[index]
-			local root = GameMap.characterRoot(player)
-			if spawn ~= nil and spawn:IsA("BasePart") and root ~= nil then
+		local spawns: {BasePart} = {}
+		for _, child in spawnedSpawns:GetChildren() do
+			if child:IsA("BasePart") then
+				table.insert(spawns, child)
+			end
+		end
+		local nextSpawn = 1
+		for _, player in playing do
+			local root = livingRoot(player)
+			local spawn = spawns[nextSpawn]
+			if root ~= nil and spawn ~= nil then
 				root.CFrame = spawn.CFrame
+				nextSpawn += 1
 			end
 		end
 	end
