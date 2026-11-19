@@ -57,13 +57,14 @@ if not diedEvent:IsA("RemoteEvent") then
 	error("DiedEvent must be a RemoteEvent")
 end
 local DiedEvent: RemoteEvent = diedEvent
+local MINIMUM_PLAYERS = 2
 local restart = false
 local matchLive = false
 local resolving = false
 
 local function newGame()
 	for _, player in Players:GetPlayers() do
-		Notice.set(player, "Reinitialazing match")
+		Notice.set(player, "Reinitializing match")
 	end
 
 	GameMap.clear()
@@ -143,6 +144,24 @@ local function onGame()
 	resolving = false
 end
 
+local function readySpectators(): number
+	local ready = 0
+	for _, player in spectators do
+		if player.Character ~= nil then
+			ready += 1
+		end
+	end
+	return ready
+end
+
+local function returnPlayingToSpectators()
+	local returning = table.clone(playingPlayers)
+	for _, player in returning do
+		PlayerLists.remove(player)
+		PlayerLists.addSpectator(player)
+	end
+end
+
 local function startGame()
 	for _, player in Players:GetPlayers() do
 		Notice.set(player, "Waiting for Players")
@@ -150,15 +169,21 @@ local function startGame()
 
 	task.wait(20)
 
-	repeat
+	while true do
+		if readySpectators() >= MINIMUM_PLAYERS then
+			PlayerLists.moveSpectatorsToPlaying()
+			if #playingPlayers >= MINIMUM_PLAYERS then
+				break
+			end
+			returnPlayingToSpectators()
+		end
 		task.wait(1)
-	until #spectators >= 1
+	end
 
 	for _, player in Players:GetPlayers() do
 		Notice.set(player, "Starting Match")
 	end
 
-	PlayerLists.moveSpectatorsToPlaying()
 	GameMap.create()
 	GameMap.beginRound(playingPlayers)
 	matchLive = true
