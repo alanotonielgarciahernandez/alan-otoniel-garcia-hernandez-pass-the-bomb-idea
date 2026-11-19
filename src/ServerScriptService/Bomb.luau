@@ -49,6 +49,19 @@ end
 
 local bombTemplate = asBomb(ServerStorage:WaitForChild("Bomb"))
 
+local function rightGrip(character: Model): BasePart?
+	local grip = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
+	if grip ~= nil and grip:IsA("BasePart") then
+		return grip
+	end
+	return nil
+end
+
+local function prepareCarriedBomb(bomb: BombPart)
+	bomb.CanCollide = false
+	bomb.Massless = true
+end
+
 local function runBomb(instance: Instance)
 	local bomb = asBomb(instance)
 	if bomb:GetAttribute("BombStarted") == true then
@@ -75,9 +88,9 @@ local function runBomb(instance: Instance)
 		end
 
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
-		local rightHand = character:FindFirstChild("RightHand")
+		local grip = rightGrip(character)
 		local carrier = bomb.Parent
-		if humanoid == nil or rightHand == nil or not rightHand:IsA("BasePart") then
+		if humanoid == nil or grip == nil then
 			return
 		end
 		if carrier == nil or not carrier:IsA("Model") then
@@ -91,12 +104,13 @@ local function runBomb(instance: Instance)
 		db.Value = true
 		carrierHumanoid.WalkSpeed = 22
 		local newBomb = asBomb(bombTemplate:Clone())
+		prepareCarriedBomb(newBomb)
 		newBomb.bombtime.Value = bomb.bombtime.Value
 		newBomb.G.Value = G.Value
 		newBomb.B.Value = B.Value
 
 		local weld = Instance.new("WeldConstraint")
-		weld.Part0 = rightHand
+		weld.Part0 = grip
 		weld.Part1 = newBomb
 		weld.Parent = newBomb
 
@@ -104,7 +118,7 @@ local function runBomb(instance: Instance)
 
 		newBomb.plrname.Value = character.Name
 		newBomb.db.Value = true
-		newBomb.CFrame = rightHand.CFrame
+		newBomb.CFrame = grip.CFrame
 		newBomb.Parent = character
 		humanoid.WalkSpeed = 30
 		CollectionService:AddTag(newBomb, BOMB_TAG)
@@ -180,21 +194,22 @@ function BombService.give(playingPlayers: {Player})
 		return
 	end
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	local rightHand = character:FindFirstChild("RightHand")
-	if humanoid == nil or rightHand == nil or not rightHand:IsA("BasePart") then
+	local grip = rightGrip(character)
+	if humanoid == nil or grip == nil then
 		return
 	end
 
 	local bomb = asBomb(bombTemplate:Clone())
+	prepareCarriedBomb(bomb)
 	humanoid.WalkSpeed = 30
 
 	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = rightHand
+	weld.Part0 = grip
 	weld.Part1 = bomb
 	weld.Parent = bomb
 
 	bomb.plrname.Value = character.Name
-	bomb.CFrame = rightHand.CFrame
+	bomb.CFrame = grip.CFrame
 	bomb.Parent = character
 	CollectionService:AddTag(bomb, BOMB_TAG)
 end
